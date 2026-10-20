@@ -14,7 +14,7 @@ export default function HomeScreen() {
           <SidebarMenuButton />
         </View>
 
-        <ThemedView type="backgroundElement" style={styles.stepContainer}>
+        <ThemedView style={styles.stepContainer}>
           <CommunityCard
             title='Community'
             description='Discover local clubs, groups, and organizations'
@@ -40,7 +40,7 @@ const styles = StyleSheet.create({
   },
   safeArea: {
     flex: 1,
-    paddingHorizontal: Spacing.four,
+    // paddingHorizontal: Spacing.four,
     alignItems: 'center',
     gap: Spacing.three,
     paddingBottom: BottomTabInset + Spacing.three,
@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
   stepContainer: {
     gap: Spacing.three,
     alignSelf: 'stretch',
-    padding: Spacing.three,
+    // padding: Spacing.three,
     borderRadius: Spacing.three,
   },
 });
