@@ -8,7 +8,8 @@
     "scheme": "play",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "icon": "./assets/expo.icon"
+      "icon": "./assets/expo.icon",
+      "bundleIdentifier": "com.eas-hosain-2.play"
     },
     "android": {
       "adaptiveIcon": {
