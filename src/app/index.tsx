@@ -1,27 +1,51 @@
-import { StyleSheet, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { FlatList, StyleSheet, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-import { CommunityCard } from '@/components/community-related/CommunityCard';
-import { SidebarMenuButton } from '@/components/sidebar/sidebar-menu-button';
-import { ThemedView } from '@/components/themed-view';
-import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
+import { CommunityCard } from "@/components/community-related/CommunityCard";
+import { SidebarMenuButton } from "@/components/sidebar/sidebar-menu-button";
+import { ThemedView } from "@/components/themed-view";
+import { communityData } from "@/constants/community-data";
+import { BottomTabInset, MaxContentWidth, Spacing } from "@/constants/theme";
 
 export default function HomeScreen() {
   return (
     <ThemedView style={styles.container}>
-      <SafeAreaView style={styles.safeArea}>
+      <SafeAreaView style={styles.safeArea} edges={["top", "left", "right"]}>
         <View style={styles.header}>
           <SidebarMenuButton />
         </View>
 
-        <ThemedView style={styles.stepContainer}>
-          <CommunityCard
-            title='Community'
-            description='Discover local clubs, groups, and organizations'
-            icon='group'
-            onPress={() => { }}
-          />
-        </ThemedView>
+        <FlatList
+          style={styles.list}
+          data={communityData}
+          renderItem={({ item }) => (
+            <ThemedView style={styles.stepContainer}>
+              <CommunityCard
+                title={item.title}
+                description={item.description}
+                icon={item.icon}
+                onPress={() => {
+                  console.log("Selected community:", item.id);
+                }}
+                authorName={item.authorName}
+                authorImage={item.authorImage}
+                timeAgo={item.timeAgo}
+                postImages={item.postImages}
+                likeCount={item.likeCount}
+                commentCount={item.commentCount}
+                shareCount={item.shareCount}
+                isFollowing={item.isFollowing}
+              />
+            </ThemedView>
+          )}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={{
+            paddingHorizontal: Spacing.three,
+            paddingBottom: BottomTabInset + Spacing.three,
+            flexGrow: 1,
+          }}
+          showsVerticalScrollIndicator={false}
+        />
       </SafeAreaView>
     </ThemedView>
   );
@@ -30,39 +54,30 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    flexDirection: 'row',
+    justifyContent: "center",
+    flexDirection: "row",
   },
   header: {
-    alignSelf: 'stretch',
-    flexDirection: 'row',
-    alignItems: 'center',
+    alignSelf: "stretch",
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: Spacing.three,
   },
   safeArea: {
     flex: 1,
-    // paddingHorizontal: Spacing.four,
-    alignItems: 'center',
+    width: "100%",
+    alignItems: "center",
     gap: Spacing.three,
-    paddingBottom: BottomTabInset + Spacing.three,
     maxWidth: MaxContentWidth,
   },
-  heroSection: {
-    alignItems: 'center',
-    justifyContent: 'center',
+  list: {
     flex: 1,
-    paddingHorizontal: Spacing.four,
-    gap: Spacing.four,
-  },
-  title: {
-    textAlign: 'center',
-  },
-  code: {
-    textTransform: 'uppercase',
+    width: "100%",
   },
   stepContainer: {
     gap: Spacing.three,
-    alignSelf: 'stretch',
-    // padding: Spacing.three,
+    alignSelf: "stretch",
     borderRadius: Spacing.three,
+    marginBottom: Spacing.three,
   },
 });
