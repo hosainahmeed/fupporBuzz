@@ -1,5 +1,5 @@
-import { Image as OptimizedImage, type ImageLoadEventData } from 'expo-image';
-import { useCallback, useMemo, useState } from 'react';
+import { Image as OptimizedImage, type ImageLoadEventData } from "expo-image";
+import { useCallback, useMemo, useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -7,8 +7,8 @@ import {
   View,
   type ImageSourcePropType,
   type LayoutChangeEvent,
-} from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface PostImageGridProps {
   images: ImageSourcePropType[];
@@ -20,7 +20,7 @@ interface PostImageGridProps {
 
 type ImageRatioMap = Record<number, number>;
 
-const GRID_GAP = 6;
+const GRID_GAP = 3;
 const DEFAULT_SINGLE_RATIO = 4 / 3;
 
 function clamp(value: number, minimum: number, maximum: number): number {
@@ -28,17 +28,22 @@ function clamp(value: number, minimum: number, maximum: number): number {
 }
 
 function getImageSourceKey(source: ImageSourcePropType, index: number): string {
-  if (typeof source === 'number') return `asset-${source}-${index}`;
+  if (typeof source === "number") return `asset-${source}-${index}`;
   const resolvedSource = Array.isArray(source) ? source[0] : source;
   return resolvedSource?.uri || `image-${index}`;
 }
 
-function getSingleImageHeight(width: number, aspectRatio: number, fallbackHeight: number): number {
+function getSingleImageHeight(
+  width: number,
+  aspectRatio: number,
+  fallbackHeight: number,
+): number {
   if (width <= 0) return fallbackHeight;
 
   const naturalHeight = width / Math.max(aspectRatio, 0.1);
   if (aspectRatio < 0.9) return clamp(naturalHeight, width * 1.08, width * 1.4);
-  if (aspectRatio > 1.2) return clamp(naturalHeight, width * 0.52, width * 0.78);
+  if (aspectRatio > 1.2)
+    return clamp(naturalHeight, width * 0.52, width * 0.78);
   return clamp(naturalHeight, width * 0.82, width * 1.08);
 }
 
@@ -47,7 +52,7 @@ export const PostImageGrid = ({
   fullResolutionImages,
   maxVisible = 4,
   imageHeight = 240,
-  borderRadius = 9,
+  borderRadius = 0,
 }: PostImageGridProps) => {
   const [isViewerVisible, setIsViewerVisible] = useState(false);
   const [viewerIndex, setViewerIndex] = useState(0);
@@ -58,7 +63,10 @@ export const PostImageGrid = ({
   // const viewerImages = (fullResolutionImages?.length === images.length
   //   ? fullResolutionImages
   //   : images) as unknown as ImageSource[];
-  const visibleCount = Math.min(images.length, Math.max(1, Math.min(maxVisible, 4)));
+  const visibleCount = Math.min(
+    images.length,
+    Math.max(1, Math.min(maxVisible, 4)),
+  );
   const visibleImages = images.slice(0, visibleCount);
   const remainingCount = Math.max(images.length - visibleCount, 0);
 
@@ -67,18 +75,21 @@ export const PostImageGrid = ({
       getSingleImageHeight(
         containerWidth,
         imageRatios[0] || DEFAULT_SINGLE_RATIO,
-        imageHeight
+        imageHeight,
       ),
-    [containerWidth, imageHeight, imageRatios]
+    [containerWidth, imageHeight, imageRatios],
   );
   const multiImageHeight = useMemo(
-    () => (containerWidth > 0 ? clamp(containerWidth * 0.72, 230, 360) : imageHeight),
-    [containerWidth, imageHeight]
+    () =>
+      containerWidth > 0 ? clamp(containerWidth * 0.72, 230, 360) : imageHeight,
+    [containerWidth, imageHeight],
   );
 
   const handleLayout = useCallback((event: LayoutChangeEvent) => {
     const width = event.nativeEvent.layout.width;
-    setContainerWidth((current) => (Math.abs(current - width) > 1 ? width : current));
+    setContainerWidth((current) =>
+      Math.abs(current - width) > 1 ? width : current,
+    );
   }, []);
 
   const handleImageLoad = useCallback(
@@ -90,10 +101,10 @@ export const PostImageGrid = ({
       setImageRatios((current) =>
         Math.abs((current[index] || 0) - ratio) < 0.01
           ? current
-          : { ...current, [index]: ratio }
+          : { ...current, [index]: ratio },
       );
     },
-    []
+    [],
   );
 
   const openViewerAt = useCallback((index: number) => {
@@ -107,12 +118,13 @@ export const PostImageGrid = ({
         <TouchableOpacity
           onPress={() => setIsViewerVisible(false)}
           hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-          style={styles.closeButton}>
+          style={styles.closeButton}
+        >
           close
         </TouchableOpacity>
       </View>
     ),
-    [insets.top]
+    [insets.top],
   );
 
   if (!images || images.length === 0) return null;
@@ -125,7 +137,8 @@ export const PostImageGrid = ({
         key={index}
         style={[styles.tile, style]}
         activeOpacity={0.92}
-        onPress={() => openViewerAt(index)}>
+        onPress={() => openViewerAt(index)}
+      >
         <OptimizedImage
           source={visibleImages[index] as any}
           onLoad={(event) => handleImageLoad(index, event)}
@@ -138,7 +151,13 @@ export const PostImageGrid = ({
           recyclingKey={`post-thumbnail-${getImageSourceKey(visibleImages[index], index)}`}
         />
         {showOverlay && (
-          <View style={[StyleSheet.absoluteFill, styles.overlay, { borderRadius: borderRadius }]}>
+          <View
+            style={[
+              StyleSheet.absoluteFill,
+              styles.overlay,
+              { borderRadius: borderRadius },
+            ]}
+          >
             <Text style={styles.overlayText}>+{remainingCount}</Text>
           </View>
         )}
@@ -152,12 +171,14 @@ export const PostImageGrid = ({
     <>
       <View
         onLayout={handleLayout}
-        style={[styles.mediaContainer, { height: containerHeight }]}>
+        style={[styles.mediaContainer, { height: containerHeight }]}
+      >
         {images.length === 1 ? (
           <TouchableOpacity
             style={styles.singleTile}
             activeOpacity={0.92}
-            onPress={() => openViewerAt(0)}>
+            onPress={() => openViewerAt(0)}
+          >
             <OptimizedImage
               source={images[0] as any}
               onLoad={(event) => handleImageLoad(0, event)}
@@ -196,31 +217,23 @@ export const PostImageGrid = ({
           </View>
         )}
       </View>
-
-      {/* <ImageViewing
-        images={viewerImages}
-        imageIndex={viewerIndex}
-        visible={isViewerVisible}
-        onRequestClose={() => setIsViewerVisible(false)}
-        HeaderComponent={renderHeader}
-      /> */}
     </>
   );
 };
 
 const styles = StyleSheet.create({
   mediaContainer: {
-    width: '100%',
-    overflow: 'hidden',
-    backgroundColor: '#00223F',
+    width: "100%",
+    overflow: "hidden",
+    backgroundColor: "#ffffffff",
   },
   singleTile: {
     flex: 1,
-    position: 'relative',
+    position: "relative",
   },
   horizontalGrid: {
     flex: 1,
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: GRID_GAP,
   },
   verticalGrid: {
@@ -229,27 +242,27 @@ const styles = StyleSheet.create({
   },
   tile: {
     flex: 1,
-    position: 'relative',
-    overflow: 'hidden',
-    backgroundColor: '#001A30',
+    position: "relative",
+    overflow: "hidden",
+    backgroundColor: "#001A30",
   },
   largeTile: {
     flex: 1.35,
   },
   overlay: {
-    backgroundColor: 'rgba(168, 168, 168, 0.58)',
-    alignItems: 'center',
-    justifyContent: 'center'
+    backgroundColor: "rgba(168, 168, 168, 0.58)",
+    alignItems: "center",
+    justifyContent: "center",
   },
   overlayText: {
-    color: '#000000ff',
+    color: "#000000ff",
     fontSize: 28,
-    fontWeight: '700',
+    fontWeight: "700",
   },
   viewerHeader: {
-    width: '100%',
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "flex-end",
     paddingHorizontal: 16,
     paddingBottom: 8,
   },
@@ -257,8 +270,8 @@ const styles = StyleSheet.create({
     width: 38,
     height: 38,
     borderRadius: 19,
-    backgroundColor: 'rgba(0,0,0,0.55)',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "rgba(0,0,0,0.55)",
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
